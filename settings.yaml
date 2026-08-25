@@ -16,7 +16,7 @@ monitor: # 监控配置
     region: "中东" # 默认是中东部  覆盖中国大部分城市
 
 bot:
-  enable: false
+  enable: true
   target: ""
   sendKey: "" # 之前发送单个的依然保留
   targetList: # 推送的目标，支持多个

@@ -1,0 +1,4 @@
+name: Sunset Monitor
+
+on:
+  workflow_dispatch:

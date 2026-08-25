@@ -20,10 +20,11 @@ jobs:
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main-linux-amd64 .
 
-      - name: Prepare config
+      - name: Enable bot and configure SendKey
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
         run: |
+          sed -i 's/enable: false/enable: true/' settings.yaml
           sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
 
       - name: Run monitor

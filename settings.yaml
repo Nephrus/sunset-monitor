@@ -1,11 +1,11 @@
 monitor: # 监控配置
   city:
   cityList: # 监控的城市，支持多个城市的监听
-    - 长沙
-    - 广州
+    - 宁波
+    - 杭州
   evening: # 晚霞的监控配置，当前获取当天的晚霞
     enable: true # 是否启用
-    quality: 0.2 # 校验指标，满足指标就进行推送
+    quality: 1.0 # 校验指标，满足指标就进行推送
     time: 0 24 11,13,16 * * * # 定时任务的时间配置
   morning: # 朝霞的监控配置，当天获取第二天的朝霞
     enable: false

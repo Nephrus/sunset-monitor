@@ -2,3 +2,31 @@ name: Sunset Monitor
 
 on:
   workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main-linux-amd64 .
+
+      - name: Prepare config
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+        run: |
+          sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
+
+      - name: Run monitor
+        run: |
+          chmod +x main-linux-amd64
+          ./main-linux-amd64

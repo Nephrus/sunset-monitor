@@ -11,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test sunsetbot connection
+      - name: Test sunsetbot API
+        run: |
+          curl -v --max-time 30 \
+            "https://sunsetbot.top/?query_id=123456&intend=select_city&query_city=%E5%AE%81%E6%B3%A2&event_date=None&event=set_1&times=None"
         run: |
           echo "Testing sunsetbot.top..."
           curl -I -L --max-time 20 https://sunsetbot.top/

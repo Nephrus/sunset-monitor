@@ -1,10 +1,13 @@
 name: Sunset Monitor
 
 on:
+  schedule:
+    # UTC 08:24 = 北京时间 16:24
+    - cron: '24 8 * * *'
   workflow_dispatch:
 
 jobs:
-  build:
+  monitor:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,18 +19,14 @@ jobs:
         with:
           go-version: '1.24'
 
-      - name: Build
-        run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main-linux-amd64 .
-
-      - name: Enable bot and configure SendKey
+      - name: Inject ServerChan SendKey
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
         run: |
-          sed -i 's/enable: false/enable: true/' settings.yaml
           sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
 
-      - name: Run monitor
+      - name: Run sunset monitor once
+        env:
+          RUN_ONCE: "true"
         run: |
-          chmod +x main-linux-amd64
-          ./main-linux-amd64
+          go run .

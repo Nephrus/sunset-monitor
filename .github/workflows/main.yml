@@ -1,13 +1,10 @@
 name: Sunset Monitor
 
 on:
-  schedule:
-    # UTC 08:24 = 北京时间 16:24
-    - cron: '24 8 * * *'
   workflow_dispatch:
 
 jobs:
-  monitor:
+  test-api:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,26 +12,3 @@ jobs:
         run: |
           curl -v --max-time 30 \
             "https://sunsetbot.top/?query_id=123456&intend=select_city&query_city=%E5%AE%81%E6%B3%A2&event_date=None&event=set_1&times=None"
-        run: |
-          echo "Testing sunsetbot.top..."
-          curl -I -L --max-time 20 https://sunsetbot.top/
-
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.24'
-
-      - name: Inject ServerChan SendKey
-        env:
-          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
-        run: |
-          sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
-
-      - name: Run sunset monitor once
-        env:
-          RUN_ONCE: "true"
-        run: |
-          go run .

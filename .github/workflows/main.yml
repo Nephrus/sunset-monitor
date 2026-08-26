@@ -2,8 +2,8 @@ name: Sunset Monitor
 
 on:
   schedule:
-    # 北京时间每天 16:24
-    - cron: '24 8 * * *'
+    # 北京时间每天 16:00
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
@@ -33,12 +33,6 @@ jobs:
           else
             echo "ServerChan SendKey has been injected"
           fi
-
-      - name: Test WeChat notification
-        env:
-          TEST_PUSH: "true"
-        run: |
-          go run .
 
       - name: Run sunset monitor once
         env:

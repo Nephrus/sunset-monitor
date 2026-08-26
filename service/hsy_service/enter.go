@@ -134,6 +134,11 @@ func parseQuality(qualityStr string) (float64, error) {
 
 // 检查并处理火烧云指标
 func checkAndNotify(data *SunsetBotResponse, e config.MonitorEvent) {
+	if data.TbQuality == "-" {
+		logrus.Infof("城市: %s 当前暂无火烧云质量数据，跳过推送", data.City)
+		return
+	}
+
 	quality, err := parseQuality(data.TbQuality)
 	if err != nil {
 		logrus.Errorf("解析火烧云质量失败: %s", err)

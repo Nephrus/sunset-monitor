@@ -10,12 +10,12 @@ jobs:
   monitor:
     runs-on: ubuntu-latest
 
-    steps:    
-    - name: Test sunsetbot connection
+    steps:
+      - name: Test sunsetbot connection
         run: |
           echo "Testing sunsetbot.top..."
           curl -I -L --max-time 20 https://sunsetbot.top/
-          
+
       - name: Checkout
         uses: actions/checkout@v4
 

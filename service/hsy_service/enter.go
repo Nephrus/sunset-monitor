@@ -57,27 +57,45 @@ func GetSunsetData(req SunsetBotReq) (*SunsetBotResponse, error) {
 
 	fullURL := fmt.Sprintf("%s?%s", baseURL, params.Encode())
 
-	resp, err := http.Get(fullURL)
-	if err != nil {
-		return nil, fmt.Errorf("请求失败: %w", err)
-	}
-	defer resp.Body.Close()
+	var lastErr error
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API返回非200状态码: %d", resp.StatusCode)
+	for attempt := 1; attempt <= 3; attempt++ {
+		resp, err := http.Get(fullURL)
+
+		if err != nil {
+			lastErr = fmt.Errorf("请求失败: %w", err)
+		} else {
+			body, readErr := io.ReadAll(resp.Body)
+			resp.Body.Close()
+
+			if readErr != nil {
+				lastErr = fmt.Errorf("读取响应失败: %w", readErr)
+			} else if resp.StatusCode != http.StatusOK {
+				lastErr = fmt.Errorf("API返回非200状态码: %d", resp.StatusCode)
+			} else {
+				var data SunsetBotResponse
+
+				if err := json.Unmarshal(body, &data); err != nil {
+					lastErr = fmt.Errorf("JSON解析失败: %w", err)
+				} else {
+					data.City = req.City
+					return &data, nil
+				}
+			}
+		}
+
+		if attempt < 3 {
+			logrus.Warnf(
+				"请求%s失败，第%d次尝试，2秒后重试: %s",
+				req.City,
+				attempt,
+				lastErr,
+			)
+			time.Sleep(2 * time.Second)
+		}
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("读取响应失败: %w", err)
-	}
-
-	var data SunsetBotResponse
-	if err := json.Unmarshal(body, &data); err != nil {
-		return nil, fmt.Errorf("JSON解析失败: %w", err)
-	}
-	data.City = req.City
-	return &data, nil
+	return nil, lastErr
 }
 
 // GetCitySunsetData 获取指定城市的天气数据

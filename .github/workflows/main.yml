@@ -25,6 +25,15 @@ jobs:
         run: |
           sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
 
+      - name: Check ServerChan configuration
+        run: |
+          if grep -q 'sendKey: ""' settings.yaml; then
+            echo "ERROR: SendKey injection failed"
+            exit 1
+          else
+            echo "ServerChan SendKey has been injected"
+          fi
+
       - name: Run sunset monitor once
         env:
           RUN_ONCE: "true"

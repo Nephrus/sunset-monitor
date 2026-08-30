@@ -55,7 +55,7 @@ func main() {
 
 			if i < 3 {
 				log.Printf("本次检查完成，1小时后进行下一次检查")
-				time.Sleep(10 * time.Second)
+				time.Sleep(1 * time.Hour)
 			}
 		}
 

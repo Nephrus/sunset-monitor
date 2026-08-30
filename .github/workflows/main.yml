@@ -2,8 +2,8 @@ name: Sunset Monitor
 
 on:
   schedule:
-    # 北京时间每天 16:00
-    - cron: '0 8 * * *'
+    # UTC 06:00 = 北京时间 14:00
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
 jobs:
@@ -11,31 +11,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # 1. 拉取代码
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. 安装 Go
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
 
+      # 3. 注入 Server酱 SendKey
       - name: Inject ServerChan SendKey
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
         run: |
           sed -i "s/sendKey: \"\"/sendKey: \"${SERVERCHAN_SENDKEY}\"/" settings.yaml
 
-      - name: Check ServerChan configuration
-        run: |
           if grep -q 'sendKey: ""' settings.yaml; then
-            echo "ERROR: SendKey injection failed"
+            echo "ERROR: ServerChan SendKey injection failed"
             exit 1
           else
             echo "ServerChan SendKey has been injected"
           fi
 
-      - name: Run sunset monitor once
+      # 4. 启动多次监控
+      - name: Run sunset monitor
         env:
-          RUN_ONCE: "true"
+          RUN_MULTI: "true"
         run: |
           go run .

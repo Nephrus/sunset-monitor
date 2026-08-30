@@ -7,7 +7,9 @@ import (
 	"flame_clouds/service/cron_service"
 	"flame_clouds/service/hsy_service"
 	"flame_clouds/service/message_push_service"
+	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -37,10 +39,27 @@ func main() {
 		)
 
 		if err != nil {
-			core.InitLogger()
+			log.Printf("测试推送失败: %v", err)
 			return
 		}
 
+		return
+	}
+
+	// 多次检查模式
+	if os.Getenv("RUN_MULTI") == "true" {
+		for i := 0; i < 4; i++ {
+			log.Printf("开始第 %d 次晚霞监控检查", i+1)
+
+			hsy_service.GetCitySunsetData(global.Config.Monitor.Evening)
+
+			if i < 3 {
+				log.Printf("本次检查完成，1小时后进行下一次检查")
+				time.Sleep(1 * time.Hour)
+			}
+		}
+
+		log.Printf("今日4次晚霞监控全部完成")
 		return
 	}
 
